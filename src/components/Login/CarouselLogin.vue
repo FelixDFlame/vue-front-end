@@ -1,57 +1,80 @@
 <template>
-  <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="1000">
-    <ol class="carousel-indicators">
-      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-      <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-      <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-    </ol>
-    <div class="carousel-inner" role="listbox">
-      <div class="carousel-item active">
-        <img
-          class="d-block img-fluid"
-          src="https://static.pexels.com/photos/33972/pexels-photo.jpg"
-          alt="First slide"
-        />
-        <div class="carousel-caption d-none d-md-block">
-          <div class="banner-text">
-            <h2>This is Heaven</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation</p>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img
-          class="d-block img-fluid"
-          src="https://images.pexels.com/photos/7097/people-coffee-tea-meeting.jpg"
-          alt="First slide"
-        />
-        <div class="carousel-caption d-none d-md-block">
-          <div class="banner-text">
-            <h2>This is Heaven</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation</p>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img
-          class="d-block img-fluid"
-          src="https://images.pexels.com/photos/872957/pexels-photo-872957.jpeg"
-          alt="First slide"
-        />
-        <div class="carousel-caption d-none d-md-block">
-          <div class="banner-text">
-            <h2>This is Heaven</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <b-carousel
+    id="carouselExampleIndicators"
+    class="carousel slide"
+    v-model="slide"
+    :interval="4000"
+    controls
+    indicators
+    background="#ababab"
+    img-width="1024"
+    img-height="480"
+    style="text-shadow: 1px 1px 2px #333;"
+    @sliding-start="onSlideStart"
+    @sliding-end="onSlideEnd"
+  >
+    <b-carousel-slide
+      v-for="carouselData in carouselDatas"
+      :class="{ active : carouselData.isActive }"
+      :key="carouselData.id"
+      :img-src="carouselData.image"
+    >
+      <h1>{{ carouselData.header }}</h1>
+      <p>{{ carouselData.detail }}</p>
+    </b-carousel-slide>
+  </b-carousel>
 </template>
 <script>
 export default {
-    data:{
-        
+  name: "carouselexampleindicators",
+  data() {
+    return {
+      carouselDatas: [
+        {
+          header: "Hello World!!",
+          detail:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation",
+          image: "https://static.pexels.com/photos/33972/pexels-photo.jpg",
+          isActive: false
+        },
+        {
+          header: "Ohaiyo Sekai!!",
+          detail:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation",
+          image:
+            "https://images.pexels.com/photos/7097/people-coffee-tea-meeting.jpg",
+          isActive: true
+        },
+        {
+          header: "Selamat Pagi!!",
+          detail:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation",
+          image:
+            "https://images.pexels.com/photos/872957/pexels-photo-872957.jpeg",
+          isActive: false
+        }
+      ],
+      slide: 0,
+      sliding: null
+    };
+  },
+  methods: {
+    onSlideStart(slide) {
+      this.sliding = true;
+    },
+    onSlideEnd(slide) {
+      this.sliding = false;
     }
-}
+  }
+};
 </script>
+
+<style scoped>
+img {
+  max-width: 1024px;
+  max-height: 480px;
+  min-width: 1024px;
+  min-height: 480px;
+}
+</style>
+

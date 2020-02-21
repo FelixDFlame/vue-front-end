@@ -1,17 +1,17 @@
 <template>
   <div class="about">
-    <Navigation />
+    <TheNavigation />
     <h1>This is an about page</h1>
   </div>
 </template>
 <script>
 // @ is an alias to /src
-import Navigation from "@/components/Navigation.vue";
+import TheNavigation from "@/components/TheNavigation.vue";
 
 export default {
   name: "about",
   components: {
-    Navigation
+    TheNavigation
   }
 };
 </script>
