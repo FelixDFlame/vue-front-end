@@ -1,58 +1,18 @@
 <template>
-  <div class="container">
-    <TheNavigation />
-    <section class="topic">
-      <h1>Welcome to {{ this.destination.name }}</h1>
-      <img :src="this.destination.image" />
-      <p>{{ this.destination.detail }}</p>
-    </section>
-    <section class="landmark">
-      <h2>Landmark</h2>
-      <b-card-group columns>
-        <div class="kartu" v-for="landmark in this.destination.landmarks" :key="landmark.id">
-          <router-link
-            :to="{
-              name: 'landmark',
-              params: { landmarkName: landmark.name },
-              hash: '#landmark_detail'
-            }"
-          >
-            <b-card
-              class="my-card"
-              :title="landmark.name"
-              :img-src="landmark.image"
-              img-alt="@/assets/logo.png"
-            >
-              <!-- <b-card-text>{{landmark.detail}}</b-card-text> -->
-            </b-card>
-          </router-link>
-        </div>
-      </b-card-group>
-    </section>
-    <!-- <transition name="slide" mode="out-in"> -->
-    <transition name="fade" mode="out-in">
-      <section class="landmark_detail">
-        <router-view :key="$route.path" />
-      </section>
-    </transition>
-
-    <div class="spacer"></div>
-  </div>
+  <section>
+    <h2>{{ this.landmark.name }}</h2>
+    <div class="my-details">
+      <img :src="this.landmark.image" />
+      <p>{{ this.landmark.detail }}</p>
+    </div>
+  </section>
 </template>
 <script>
-import TheNavigation from "@/components/TheNavigation.vue";
-import { BCard } from "bootstrap-vue";
-
 export default {
-  name: "DynamicTesting",
-  components: {
-    TheNavigation,
-    BCard
-  },
   data() {
     return {
-      //jelek jika kita pakai $route bukan best practice
-      //best practice gunakan props sebagai pass datanya
+      // jelek jika kita pakai $route bukan best practice
+      // best practice gunakan props sebagai pass datanya
       // userId: this.$route.params.idUser
       allDestinations: [
         {
@@ -110,6 +70,10 @@ export default {
     destinationName: {
       type: String,
       required: true
+    },
+    landmarkName: {
+      type: String,
+      required: true
     }
   },
   computed: {
@@ -122,42 +86,18 @@ export default {
         this.$router.push("/404");
       }
       return destinationResult;
+    },
+    landmark() {
+      let landmarkResult = this.destination.landmarks.find(
+        land => land.name === this.landmarkName
+      );
+      if (!landmarkResult) {
+        this.$router.push("/404");
+      }
+      return landmarkResult;
     }
   }
 };
 </script>
 <style scoped>
-.my-card {
-  width: 350px;
-  height: 350px;
-  margin-right: 20px;
-  background-size: cover;
-  display: inline-flex;
-}
-.spacer {
-  height: 100px;
-}
-
-/* animation */
-/* slider */
-.slide-enter-active,
-.slide-leave-active {
-  transition: opacity 0.5s, transform 0.5s;
-}
-
-.slide-enter,
-.slide-leave-to {
-  opacity: 0;
-  transform: translateX(-30%);
-}
-
-/* fade */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
 </style>

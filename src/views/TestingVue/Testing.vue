@@ -46,6 +46,11 @@
       <input type="submit" @click="kirim" />
     </div>
     <div class="api-requested">{{ info }}</div>
+    <div class="tesVuetify">
+      <h3>Testing Vuetify</h3>
+      <div>
+      </div>
+    </div>
   </div>
 </template>
 
