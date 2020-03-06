@@ -9,5 +9,6 @@ function setAuthorizationToken(token: String) {
 }
 
 export default axios.create({
-    baseURL: 'http://localhost:8082/api'
+    baseURL: 'https://reqres.in/api'
+    // baseURL: 'http://localhost:8082/api'
 })

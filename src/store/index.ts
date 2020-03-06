@@ -1,9 +1,20 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex, { Store } from 'vuex'
 import VuexPersistence from 'vuex-persist'
 import axios from '@/axios'
+import shop from '@/api'
 
 Vue.use(Vuex)
+
+//initState
+const initState = {
+  message: "",
+  count: 0,
+  products: [],
+  cart: [],
+  checkoutStatus: null
+};
+
 
 export default new Vuex.Store({
   state: {
@@ -21,6 +32,9 @@ export default new Vuex.Store({
     //Bagian testing Vuex
     message: "Hello Felix",
     count: 0,
+    products: [],
+    cart: [],//{id,quantity}
+    checkoutStatus: null,
 
     //Bagian Movie
     movies: [
@@ -91,48 +105,91 @@ export default new Vuex.Store({
     //hanya bisa digunakan ketika sync
     increment: (state: any, payload) => {
       state.count += payload
+    },
+    //bagian Learn Vuex
+    setProducts(state: any, products) {
+      state.products = products;
+      console.log(state.products[0].inventory)
+    },
+    decrementProductInventory(state, product) {
+      product.inventory--
+    },
+    pushProductToCart(state, productId) {
+      state.cart.push({
+        id: productId,
+        quantity: 1
+      })
+    },
+    incrementCartQuantity(state, cartItem) {
+      cartItem.quantity++
+    },
+    setCheckoutStatus(state, status) {
+      (status == 'success') ?
+        state.checkoutStatus = true
+        : state.checkoutStatus = false
+    },
+    emptyCart(state) {
+      state.cart = []
+    },
+    resetState(state) {
+      Object.assign(state, initState)
     }
-
-    // [AUTH_REQUEST]: (state) => {
-    //   state.status = 'loading'
-    // },
-    // [AUTH_SUCCESS]: (state, token) => {
-    //   state.status = 'success'
-    //   state.token = token
-    // },
-    // [AUTH_ERROR]: (state) => {
-    //   state.status = 'error'
-    // },
   },
   actions: {
     //equal *methods di vue (make api call here)
     //contoh : fetchProduct()
 
+    //biasanya dalam bentuk promise utk fetch Data
+    fetchProducts(context) {
+      return new Promise((resolve, reject) => {
+        // make the call
+        // to run setProduct pada mutation
+        //context adalah store object
+        shop.getProducts((products: any) => {
+          //commit utk call mutations
+          context.commit('setProducts', products)
+          resolve()
+        })
+      })
+    },
+    addProductToCart(context, product) {
+      if (context.getters.productIsInStock(product)) {
+        const cartItem = context.state.cart.find(
+          (item: any) => item.id === product.id
+        );
+        if (cartItem) {
+          //sudah ada dalam cart
+          context.commit('incrementCartQuantity', cartItem)
+        } else {
+          //belum ada dalam cart
+          context.commit('pushProductToCart', product.id)
+        }
+        //kurangin stock
+        context.commit('decrementProductInventory', product)
+      } else {
+        //item kosong
+        
+        //do nothing
+      }
+    },
+    //{state , commit} merupakan content property 
+    //destructuring ES 6
+    checkout({ state, commit }) {
+      shop.buyProducts(state.cart,
+        () => {
+          commit('emptyCart')
+          commit('setCheckoutStatus', 'success')
+        },
+        //call back failed
+        () => {
+          commit('setCheckoutStatus', 'failed')
+        })
+    },
     //digunakan ketika can be async ataupyn sync
     increment: (state: any, payload) => {
-      state.dispatch('increment', payload)
+      state.commit('increment', payload)
     }
 
-
-    // [AUTH_REQUEST]: ({ commit, dispatch }, user) => {
-    //   return new Promise((resolve, reject) => { // The Promise used for router redirect in login
-    //     commit(AUTH_REQUEST)
-    //     axios({ url: 'auth', data: user, method: 'POST' })
-    //       .then(resp => {
-    //         const token = resp.data.token
-    //         localStorage.setItem('user-token', token) // store the token in localstorage
-    //         commit(AUTH_SUCCESS, token)
-    //         // you have your token, now log in your user :)
-    //         dispatch(USER_REQUEST)
-    //         resolve(resp)
-    //       })
-    //       .catch(err => {
-    //         commit(AUTH_ERROR, err)
-    //         localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
-    //         reject(err)
-    //       })
-    //   })
-    // }
   },
   getters: {
     //equal *computed property di vue
@@ -147,16 +204,44 @@ export default new Vuex.Store({
     counter: (state: any) => {
       return state.count
     },
+    availableProducts(state, getters) {
+      return state.products.filter(
+        (product: any) => { return product.inventory > 0 }
+      )
+    },
+    cartProducts(state, getters) {
+      let dataProducts = state.cart.map((cartItem: any) => {
+        const product = state.products.find((product: any) => product.id === cartItem.id)
+        return {
+          title: product.title,
+          price: product.price,
+          quantity: cartItem.quantity
+        }
+      })
+      return dataProducts
+    },
+    cartTotalPrice(state, getters) {
+      let totalPrice = 0
+      //getters ini mengambil data yang berada pada getters
+      getters.cartProducts.forEach((product: any) => {
+        totalPrice += product.price * product.quantity
+      })
+      return totalPrice
+
+      //singkatnya
+      // return getters.cartProducts.reduce(() => total + product.price*product.quantity,0)
+    },
+    productIsInStock() {
+      //buat productIsInStock memiliki (perlu 1 parameter yaitu product)
+      return (product: any) => {
+        return product.inventory > 0
+      }
+    },
+
     //Bagian Movie
     getMovies: (state: any) => {
       return state.movies
     }
-
-
-    //Region Auth 
-    // isAuthenticated: state => !!state.token,
-    // authStatus: state => status.status
-    //End Region Auth 
 
   },
   modules: {

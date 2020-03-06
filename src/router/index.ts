@@ -81,6 +81,21 @@ const routes = [
     }
   ]),
   {
+    path: '/main',
+    name: 'main',
+    component: () => import(/* webpackChunkName: "Main" */ '../views/Main/MainPage.vue'),
+  },
+  {
+    path: '/report',
+    name: 'report',
+    component: () => import(/* webpackChunkName: "Report" */ '../views/TestingVue/ReportingTable.vue'),
+  },
+  {
+    path: '/req',
+    name: 'req',
+    component: () => import(/* webpackChunkName: "Request" */ '../views/TestingVue/RequestAPISmartTable.vue'),
+  },
+  {
     //usahakan letakkan di paling bawah 
     //cara baca route jika telah ditemukan all yaitu * maka yang
     //dibwh tidak di jlnkan lagi * penanda all selain yang ada di route

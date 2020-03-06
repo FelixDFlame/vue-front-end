@@ -68,8 +68,9 @@
 <script>
 import CarouselLogin from "@/components/Login/CarouselLogin.vue";
 import BaseNotificationMessageComponent from "@/components/BaseNotificationMessageComponent.vue";
-import { BToast,BToaster } from 'bootstrap-vue'
-import axios from '@/axios'
+import axios from "@/axios";
+
+import { BToast, BToaster } from "bootstrap-vue";
 
 export default {
   name: "home",
@@ -164,12 +165,11 @@ export default {
         });
     },
     makeToast(variant = null, header = null, detail = null) {
-      this.$bvToast.toast(detail, {
+      this.$root.$bvToast.toast(detail, {
         title: header,
-        toaster: 'b-toaster-top-right',
-        variant: variant,
-        solid: true,
-        noAutoHide: true
+        toaster: "b-toaster-top-right",
+        autoHideDelay: 5000,
+        variant : variant || 'default'
       });
     }
   }
